@@ -1,8 +1,6 @@
 import express from 'express'
 import { env } from '~/config/environment'
 import jwt from 'jsonwebtoken'
-import exitHook from 'async-exit-hook'
-import { CONNECT_DB, CLOSE_DB } from '~/config/mongodb'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 import { StatusCodes } from 'http-status-codes'
 import { connectDB } from '~/config/database'
@@ -10,7 +8,6 @@ import { connectDB } from '~/config/database'
 
 const START_SERVER = () => {
   const app = express()
-
   // Enable req.body json data
   app.use(express.json())
 
