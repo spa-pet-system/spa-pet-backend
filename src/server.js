@@ -4,16 +4,23 @@ import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 import { connectDB } from '~/config/database'
 import authRoutes from '~/routes/authRoutes'
 import customerRoutes from '~/routes/customerRoutes'
+import cookieParser from 'cookie-parser'
+import cors from 'cors'
 
 const START_SERVER = () => {
   const app = express()
   // Enable req.body json data
 
   app.use(express.json())
+  app.use(cors({
+    origin: 'http://localhost:5173', // React app
+    credentials: true // 👈 bắt buộc để gửi cookie
+  }))
+  app.use(cookieParser())
+  app.use(errorHandlingMiddleware) // Middleware xử lý lỗi tập trung
+
   app.use('/api/auth', authRoutes)
   app.use('/api/customer', customerRoutes)
-  // Middleware xử lý lỗi tập trung
-  app.use(errorHandlingMiddleware)
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
     // eslint-disable-next-line no-console

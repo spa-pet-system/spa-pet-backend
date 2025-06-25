@@ -4,7 +4,6 @@ const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: false,
       lowercase: true,
       trim: true
     },
@@ -30,15 +29,40 @@ const userSchema = new mongoose.Schema(
       minlength: 2,
       maxlength: 30
     },
+    avatar: {
+      type: String,
+      default: '' // URL ảnh
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+      default: 'other'
+    },
+    address: {
+      type: String,
+      default: ''
+    },
+    dob: {
+      type: Date
+    },
+    isActive: {
+      type: Boolean,
+      default: true
+    },
+    verified: {
+      type: Boolean,
+      default: false
+    },
     refreshToken: {
       type: String,
       default: ''
     }
   },
   {
-    timestamps: true // tạo createdAt và updatedAt
+    timestamps: true
   }
 )
+
 
 const User = mongoose.model('User', userSchema)
 export default User

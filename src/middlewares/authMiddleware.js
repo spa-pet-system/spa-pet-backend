@@ -25,6 +25,27 @@ const authenToken = (req, res, next) => {
   })
 }
 
+const authenTokenCookie = (req, res, next) => {
+  const token = req.cookies.token
+
+  console.log('token:', token);
+
+  if (!token) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'No token provided' })
+  }
+
+  jwt.verify(token, env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(StatusCodes.FORBIDDEN).json({ error: 'Invalid or expired token' })
+    }
+
+    console.log('decode:', decoded)
+
+    req.user = decoded
+    next()
+  })
+}
+
 const isAdmin = (req, res, next) => {
   if (req.user?.role !== 'admin') {
     return res.status(StatusCodes.FORBIDDEN).json({ error: 'Admin access only' })
@@ -41,6 +62,7 @@ const isCustomer = (req, res, next) => {
 
 export const authMiddleware = {
   authenToken,
+  authenTokenCookie,
   isAdmin,
   isCustomer
 }

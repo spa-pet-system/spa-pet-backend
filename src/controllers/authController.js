@@ -5,7 +5,7 @@ import { genarateAccessToken } from '~/utils/genarateTokens'
 
 const registerByPhone = async (req, res) => {
   try {
-    const { phone, password } = req.body
+    const { phone, password, name } = req.body
 
     const existingUser = await User.findOne({ phone })
     if (existingUser) {
@@ -14,7 +14,7 @@ const registerByPhone = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const newUser = new User({ phone, password: hashedPassword })
+    const newUser = new User({ phone, password: hashedPassword, name })
     await newUser.save()
 
     res.status(201).json({ message: 'Tạo tài khoản thành công' })
@@ -32,23 +32,41 @@ const login = async (req, res) => {
   }
 
   if (!(await bcrypt.compare(password, currentUser.password))) {
-    return res.status(StatusCodes.NOT_FOUND).json({ message: 'Sai MK' })
+    return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Sai MK' })
   }
 
   const payload = {
     _id: currentUser._id,
     role: currentUser.role,
-    phone: currentUser.phone
+    phone: currentUser.phone,
+    name: currentUser.name,
+    avatar: currentUser.avatar
   }
 
   const accessToken = genarateAccessToken(payload)
 
-  console.log('accessToken:', accessToken)
-  res.json({ accessToken, payload })
+  res.cookie('token', accessToken, {
+    httpOnly: true,
+    secure: false, // nếu dùng HTTPS thì để true
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000 // 1 ngày
+  })
+  res.json({ message: 'Login successful' })
+}
+
+const logout = (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false // nếu dùng HTTPS thì để true
+  })
+
+  res.status(200).json({ message: 'Logged out successfully' })
 
 }
 
 export const authController = {
   registerByPhone,
-  login
+  login,
+  logout
 }
