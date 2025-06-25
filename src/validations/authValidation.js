@@ -12,6 +12,7 @@ const registerByPhone = async (req, res, next) => {
         'string.pattern.base': 'Số điện thoại không đúng định dạng',
         'any.required': 'Số điện thoại là bắt buộc'
       }),
+
     password: Joi.string()
       .trim()
       .strict()
@@ -20,14 +21,26 @@ const registerByPhone = async (req, res, next) => {
       .messages({
         'string.min': 'Mật khẩu phải ít nhất 6 ký tự',
         'any.required': 'Mật khẩu là bắt buộc'
+      }),
+
+    name: Joi.string()
+      .trim()
+      .min(2)
+      .max(30)
+      .required()
+      .messages({
+        'string.min': 'Tên phải có ít nhất 2 ký tự',
+        'string.max': 'Tên không được vượt quá 30 ký tự',
+        'any.required': 'Tên là bắt buộc'
       })
   })
+
   try {
-    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    await correctCondition.validateAsync(req.body, { abortEarly: false });
     next()
   } catch (error) {
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
-      errors: new Error(error).message
+      errors: error.details.map(err => err.message) // trả về danh sách lỗi
     })
   }
 }

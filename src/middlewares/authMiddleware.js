@@ -29,7 +29,6 @@ const authenTokenCookie = (req, res, next) => {
   const token = req.cookies.token
 
   console.log('token:', token);
-  
 
   if (!token) {
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'No token provided' })
@@ -40,8 +39,7 @@ const authenTokenCookie = (req, res, next) => {
       return res.status(StatusCodes.FORBIDDEN).json({ error: 'Invalid or expired token' })
     }
 
-    console.log('decode:',decoded)
-    
+    console.log('decode:', decoded)
 
     req.user = decoded
     next()

@@ -5,7 +5,7 @@ import { genarateAccessToken } from '~/utils/genarateTokens'
 
 const registerByPhone = async (req, res) => {
   try {
-    const { phone, password } = req.body
+    const { phone, password, name } = req.body
 
     const existingUser = await User.findOne({ phone })
     if (existingUser) {
@@ -14,7 +14,7 @@ const registerByPhone = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const newUser = new User({ phone, password: hashedPassword })
+    const newUser = new User({ phone, password: hashedPassword, name })
     await newUser.save()
 
     res.status(201).json({ message: 'Tạo tài khoản thành công' })
@@ -38,7 +38,9 @@ const login = async (req, res) => {
   const payload = {
     _id: currentUser._id,
     role: currentUser.role,
-    phone: currentUser.phone
+    phone: currentUser.phone,
+    name: currentUser.name,
+    avatar: currentUser.avatar
   }
 
   const accessToken = genarateAccessToken(payload)
