@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const serviceSchema = new mongoose.Schema({
 
@@ -9,7 +9,7 @@ const serviceSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['grooming','washing'],
+    enum: ['grooming', 'washing'],
     required: true
   },
   description: {
@@ -36,8 +36,8 @@ const serviceSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   }
-}, { timestamps: true });
+}, { timestamps: true })
 
 
-const Service = mongoose.model('Service', serviceSchema);
-export default Service;
+const Service = mongoose.model('Service', serviceSchema)
+export default Service

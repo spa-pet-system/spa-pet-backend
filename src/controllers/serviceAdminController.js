@@ -1,5 +1,5 @@
-import Service from "../models/Service.js";
-import { StatusCodes } from "http-status-codes";
+import Service from '../models/Service.js';
+import { StatusCodes } from 'http-status-codes';
 import cloudinary from '../config/cloudinary.js';
 
 const getAllServices = async (req, res) => {
@@ -7,27 +7,27 @@ const getAllServices = async (req, res) => {
     const services = await Service.find();
     res.status(StatusCodes.OK).json(services);
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Lỗi server" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Lỗi server' });
   }
 };
 
 const activateService = async (req, res) => {
   try {
     const service = await Service.findByIdAndUpdate(req.params.id, { isActive: true }, { new: true });
-    if (!service) return res.status(StatusCodes.NOT_FOUND).json({ message: "Không tìm thấy dịch vụ" });
-    res.json({ message: "Đã kích hoạt dịch vụ", service });
+    if (!service) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Không tìm thấy dịch vụ' });
+    res.json({ message: 'Đã kích hoạt dịch vụ', service });
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Lỗi server" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Lỗi server' });
   }
 };
 
 const deactivateService = async (req, res) => {
   try {
     const service = await Service.findByIdAndUpdate(req.params.id, { isActive: false }, { new: true });
-    if (!service) return res.status(StatusCodes.NOT_FOUND).json({ message: "Không tìm thấy dịch vụ" });
-    res.json({ message: "Đã ẩn dịch vụ", service });
+    if (!service) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Không tìm thấy dịch vụ' });
+    res.json({ message: 'Đã ẩn dịch vụ', service });
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Lỗi server" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Lỗi server' });
   }
 };
 
@@ -60,10 +60,10 @@ const uploadImage = async (req, res) => {
 const getServiceById = async (req, res) => {
   try {
     const service = await Service.findById(req.params.id);
-    if (!service) return res.status(StatusCodes.NOT_FOUND).json({ message: "Không tìm thấy dịch vụ" });
+    if (!service) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Không tìm thấy dịch vụ' });
     res.status(StatusCodes.OK).json(service);
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Lỗi server" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Lỗi server' });
   }
 };
 
@@ -74,7 +74,7 @@ const updateService = async (req, res) => {
       req.body,
       { new: true, runValidators: true }
     );
-    if (!updatedService) return res.status(StatusCodes.NOT_FOUND).json({ message: "Không tìm thấy dịch vụ" });
+    if (!updatedService) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Không tìm thấy dịch vụ' });
     res.status(StatusCodes.OK).json(updatedService);
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: err.message });
