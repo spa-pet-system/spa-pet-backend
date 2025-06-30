@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import { env } from '~/config/environment'
 
 export const genarateAccessToken = (payload) => {
-  return jwt.sign(payload, env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' })
+  return jwt.sign(payload, env.ACCESS_TOKEN_SECRET, { expiresIn: '7d' })
 }
 
 

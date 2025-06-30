@@ -2,16 +2,28 @@ import express from 'express'
 import { env } from '~/config/environment'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 import { connectDB } from '~/config/database'
+// router
 import authRoutes from '~/routes/authRoutes'
 import customerRoutes from '~/routes/customerRoutes'
+
+// admin
+import adminRoutes from './routes/adminRoutes'
+import serviceAdminRoutes  from './routes/serviceAdminRoutes'
+import productAdminRoutes  from './routes/productAdminRoutes'
+
+
+
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+const morgan = require("morgan");
+
 
 const START_SERVER = () => {
   const app = express()
   // Enable req.body json data
 
-  app.use(express.json())
+  app.use(express.json());
+  app.use(morgan("dev"));
   app.use(cors({
     origin: 'http://localhost:5173', // React app
     credentials: true // 👈 bắt buộc để gửi cookie
@@ -19,8 +31,14 @@ const START_SERVER = () => {
   app.use(cookieParser())
   app.use(errorHandlingMiddleware) // Middleware xử lý lỗi tập trung
 
+
+
+  // user router
   app.use('/api/auth', authRoutes)
   app.use('/api/customer', customerRoutes)
+  app.use('/api/admin', adminRoutes )
+  app.use('/api/admin', serviceAdminRoutes);
+  app.use('/api/admin', productAdminRoutes);
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
     // eslint-disable-next-line no-console
