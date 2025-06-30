@@ -4,7 +4,8 @@ const serviceSchema = new mongoose.Schema({
   name: String,
   description: String,
   price: Number,
-  duration: Number // phút
+  duration: Number, // phút
+  status: { type: Boolean, default: false }
 }, { timestamps: true })
 
 const Service = mongoose.model('Service', serviceSchema)
