@@ -71,7 +71,7 @@ const login = async (req, res, next) => {
   try {
     await correctCondition.validateAsync(req.body, { abortEarly: false })
     console.log('VALIDATION')
-    
+ 
     next()
   } catch (error) {
     console.log(error);
