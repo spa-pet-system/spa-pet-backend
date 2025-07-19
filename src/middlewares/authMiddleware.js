@@ -61,7 +61,6 @@ const isCustomer = (req, res, next) => {
 }
 
 export const authMiddleware = {
-  authenToken,
   authenTokenCookie,
   isAdmin,
   isCustomer

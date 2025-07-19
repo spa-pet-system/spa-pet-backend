@@ -4,8 +4,8 @@ const appointmentSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   pet: { type: mongoose.Schema.Types.ObjectId, ref: 'Pet' },
   service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service' },
-  date: { type: Date, required: true },           // Chỉ lưu ngày
-  timeSlot: { type: String, required: true },     // "09:00", "10:00"...
+  date: { type: Date, required: true }, // Chỉ lưu ngày
+  timeSlot: { type: String, required: true }, // "09:00", "10:00"...
   status: { type: String, enum: ['pending', 'confirmed', 'completed', 'cancelled'], default: 'pending' },
   note: { type: String },
   isPaid: { type: Boolean, default: false }
