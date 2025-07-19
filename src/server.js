@@ -18,6 +18,8 @@ import productAdminRoutes from './routes/productAdminRoutes'
 // product
 import productRoutes from '~/routes/productRoutes'
 import cartRoutes from './routes/cartRoutes.js'
+import paymentRoutes from './routes/paymentRoutes.js'
+import orderRoutes from './routes/orderRoutes.js'
 
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -38,6 +40,7 @@ const START_SERVER = () => {
   // user router
   app.use('/api/auth', authRoutes)
   app.use('/api/customer', customerRoutes)
+  app.use('/api/appointments', appointmentRoutes)
   app.use('/api/admin', adminRoutes )
   app.use('/api/admin', serviceAdminRoutes)
   app.use('/api/admin', productAdminRoutes)
@@ -48,6 +51,8 @@ const START_SERVER = () => {
   // Routes
   app.use('/api/products', productRoutes)
   app.use('/api/cart', cartRoutes)
+  app.use('/api/payment', paymentRoutes)
+  app.use('/api/orders', orderRoutes)
   app.use(errorHandlingMiddleware)
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
