@@ -1,11 +1,11 @@
 import mongoose from 'mongoose'
 
 const serviceSchema = new mongoose.Schema({
-
   name: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    unique: true
   },
   type: {
     type: String,
@@ -17,12 +17,8 @@ const serviceSchema = new mongoose.Schema({
     required: true
   },
   detail: {
-    type: String
-  },
-  price: {
-    type: Number,
-    required: true,
-    min: 0
+    type: [{ type: String }],
+    default: []
   },
   duration: {
     type: Number, // phút
@@ -35,6 +31,23 @@ const serviceSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  slot: {
+    type: Number,
+    required: true,
+    default: 3,
+    min: 1
+  },
+  timeSlots: [{
+    type: String,
+    required: true,
+    default: '09:00'
+  }],
+  slug: {
+    type: String,
+    trim: true,
+    required: true,
+    unique: true
   }
 }, { timestamps: true })
 

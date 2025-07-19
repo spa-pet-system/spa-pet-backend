@@ -2,7 +2,7 @@
  * Simple method to Convert a String to Slug
  * Các bạn có thể tham khảo thêm kiến thức liên quan ở đây: https://byby.dev/js-slugify-string
  */
-const slugify = (val) => {
+export const slugify = (val) => {
   if (!val) return ''
   return String(val)
     .normalize('NFKD') // split accented characters into their base characters and diacritical marks

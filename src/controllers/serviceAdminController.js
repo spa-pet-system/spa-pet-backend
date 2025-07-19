@@ -1,6 +1,7 @@
 import Service from '../models/Service.js';
 import { StatusCodes } from 'http-status-codes';
 import cloudinary from '../config/cloudinary.js';
+import { slugify } from '../utils/formatters.js';
 
 const getAllServices = async (req, res) => {
   try {
@@ -33,29 +34,34 @@ const deactivateService = async (req, res) => {
 
 // Upload ảnh lên Cloudinary
 const uploadImage = async (req, res) => {
-    try {
-      if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-      cloudinary.uploader.upload_stream(
-        { resource_type: 'image' },
-        (error, result) => {
-          if (error) return res.status(500).json({ error });
-          res.json({ url: result.secure_url });
-        }
-      ).end(req.file.buffer);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    cloudinary.uploader.upload_stream(
+      { resource_type: 'image' },
+      (error, result) => {
+        if (error) return res.status(500).json({ error });
+        res.json({ url: result.secure_url });
+      }
+    ).end(req.file.buffer);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const createService = async (req, res) => {
+  try {
+    const newServiceData = {
+      ...req.body,
+      slug: slugify(req.body.name)
     }
-  };
-  
-  const createService = async (req, res) => {
-    try {
-      const newService = new Service(req.body);
-      await newService.save();
-      res.status(StatusCodes.CREATED).json(newService);
-    } catch (err) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: err.message });
-    }
-  };
+
+    const newService = new Service(newServiceData)
+    await newService.save()
+    res.status(StatusCodes.CREATED).json(newService)
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: err.message })
+  }
+}
 
 const getServiceById = async (req, res) => {
   try {
@@ -88,5 +94,5 @@ export const serviceAdminController = {
   uploadImage,
   createService,
   getServiceById,
-  updateService
+  updateService,
 };
