@@ -7,7 +7,8 @@ const orderSchema = new mongoose.Schema({
     quantity: Number
   }],
   total: Number,
-  paymentMethod: { type: String, enum: ['cod', 'momo', 'zalo', 'paypal'], default: 'cod' },
+  orderCode: { type: String, unique: true }, // For PayOS tracking
+  paymentMethod: { type: String, enum: ['cod', 'qr'], default: 'cod' },
   status: { type: String, enum: ['pending', 'paid', 'shipped', 'delivered', 'cancelled'], default: 'pending' }
 }, { timestamps: true })
 
