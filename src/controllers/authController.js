@@ -35,12 +35,17 @@ const login = async (req, res) => {
     return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Sai MK' })
   }
 
+  if (currentUser.isActive === false) {
+    return res.status(StatusCodes.FORBIDDEN).json({ message: 'Tài khoản của bạn đã bị khóa' })
+  }
+
   const payload = {
     _id: currentUser._id,
     role: currentUser.role,
     phone: currentUser.phone,
     name: currentUser.name,
-    avatar: currentUser.avatar
+    avatar: currentUser.avatar,
+    email: currentUser.email
   }
 
   const accessToken = genarateAccessToken(payload)

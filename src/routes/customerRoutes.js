@@ -4,6 +4,6 @@ import { authMiddleware } from '~/middlewares/authMiddleware'
 
 const router = express.Router()
 
-router.get('/get-info', authMiddleware.authenToken, authMiddleware.isCustomer, customerController.getInfo)
+// router.get('/get-info', authMiddleware.authenToken, authMiddleware.isCustomer, customerController.getInfo)
 
 export default router
