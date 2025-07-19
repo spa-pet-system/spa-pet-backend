@@ -3,7 +3,10 @@ import mongoose from 'mongoose'
 const petSchema = new mongoose.Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   name: String,
-  type: String, // "dog", "cat"
+  petType:{
+    type: String,
+    enum: ['dog', 'cat'],
+    required: true },
   breed: String, //"Cỏgi"
   age: Number,
   weight: Number,
