@@ -17,7 +17,8 @@ const serviceSchema = new mongoose.Schema({
     required: true
   },
   detail: {
-    type: String
+    type: [{ type: String }],
+    default: []
   },
   duration: {
     type: Number, // phút
@@ -37,7 +38,7 @@ const serviceSchema = new mongoose.Schema({
     default: 3,
     min: 1
   },
-  timeSlots :[{
+  timeSlots: [{
     type: String,
     required: true,
     default: '09:00'
