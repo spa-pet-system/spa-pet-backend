@@ -5,6 +5,7 @@ import { connectDB } from '~/config/database'
 // router
 import authRoutes from '~/routes/authRoutes'
 import customerRoutes from '~/routes/customerRoutes'
+import appointmentRoutes from './routes/appointmentRoutes.js'
 
 // admin
 import adminRoutes from './routes/adminRoutes'
@@ -36,6 +37,7 @@ const START_SERVER = () => {
   // user router
   app.use('/api/auth', authRoutes)
   app.use('/api/customer', customerRoutes)
+  app.use('/api/appointments', appointmentRoutes)
   app.use('/api/admin', adminRoutes )
   app.use('/api/admin', serviceAdminRoutes);
   app.use('/api/admin', productAdminRoutes);

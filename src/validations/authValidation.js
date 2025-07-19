@@ -82,7 +82,84 @@ const login = async (req, res, next) => {
 }
 
 
+const updateProfile = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    name: Joi.string()
+      .trim()
+      .min(2)
+      .max(30)
+      .optional()
+      .messages({
+        'string.min': 'Tên phải có ít nhất 2 ký tự',
+        'string.max': 'Tên không được vượt quá 30 ký tự'
+      }),
+    email: Joi.string()
+      .email()
+      .optional()
+      .messages({
+        'string.email': 'Email không đúng định dạng'
+      }),
+    gender: Joi.string()
+      .valid('male', 'female', 'other')
+      .optional()
+      .messages({
+        'any.only': 'Giới tính phải là male, female hoặc other'
+      }),
+    address: Joi.string()
+      .trim()
+      .optional(),
+    dob: Joi.date()
+      .optional()
+      .messages({
+        'date.base': 'Ngày sinh không đúng định dạng'
+      }),
+    avatar: Joi.string()
+      .uri()
+      .optional()
+      .messages({
+        'string.uri': 'Avatar phải là URL hợp lệ'
+      })
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
+      errors: error.details.map(err => err.message)
+    })
+  }
+}
+
+const changePassword = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    currentPassword: Joi.string()
+      .required()
+      .messages({
+        'any.required': 'Mật khẩu hiện tại là bắt buộc'
+      }),
+    newPassword: Joi.string()
+      .min(6)
+      .required()
+      .messages({
+        'string.min': 'Mật khẩu mới phải ít nhất 6 ký tự',
+        'any.required': 'Mật khẩu mới là bắt buộc'
+      })
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
+      errors: error.details.map(err => err.message)
+    })
+  }
+}
+
 export const authValidation = {
   registerByPhone,
-  login
+  login,
+  updateProfile,
+  changePassword
 }
