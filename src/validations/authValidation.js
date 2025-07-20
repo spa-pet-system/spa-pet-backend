@@ -157,9 +157,65 @@ const changePassword = async (req, res, next) => {
   }
 }
 
+const forgotPassword = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    phone: Joi.string()
+      .trim()
+      .strict()
+      .pattern(/^0[0-9]{9}$/)
+      .required()
+      .messages({
+        'string.pattern.base': 'Số điện thoại không đúng định dạng',
+        'any.required': 'Số điện thoại là bắt buộc'
+      })
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
+      errors: error.details.map(err => err.message)
+    })
+  }
+}
+
+const resetPassword = async (req, res, next) => {
+  const schema = Joi.object({
+    token: Joi.string().required().messages({
+      'any.required': 'Thiếu token đặt lại mật khẩu'
+    }),
+    password: Joi.string().min(6).required().messages({
+      'string.min': 'Mật khẩu mới phải ít nhất 6 ký tự',
+      'any.required': 'Mật khẩu mới là bắt buộc'
+    }),
+    confirmPassword: Joi.any().valid(Joi.ref('password')).required().messages({
+      'any.only': 'Xác nhận mật khẩu không khớp',
+      'any.required': 'Xác nhận mật khẩu là bắt buộc'
+    })
+  })
+
+  const data = {
+    token: req.params.token,
+    ...req.body
+  }
+
+  try {
+    await schema.validateAsync(data, { abortEarly: false })
+    next()
+  } catch (error) {
+    res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
+      errors: error.details.map((err) => err.message)
+    })
+  }
+}
+
+
 export const authValidation = {
   registerByPhone,
   login,
   updateProfile,
-  changePassword
+  changePassword,
+  forgotPassword,
+  resetPassword
 }

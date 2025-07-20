@@ -16,5 +16,7 @@ router.get('/user-profile', authMiddleware.authenTokenCookie, userController.get
 router.put('/profile', authMiddleware.authenTokenCookie, upload.single('avatar'), authValidation.updateProfile, userController.updateProfile)
 router.post('/upload-avatar', authMiddleware.authenTokenCookie, upload.single('avatar'), userController.uploadAvatar)
 router.put('/change-password', authValidation.changePassword, authMiddleware.authenTokenCookie, userController.changePassword)
+router.post('/forgot-password', authValidation.forgotPassword, authController.forgotPassword)
+router.post('/reset-password/:token', authValidation.resetPassword, authController.resetPassword)
 
 export default router

@@ -1,8 +1,9 @@
 import Appointment from '../models/Appointment.js'
-import Pet from '../models/Pet.js'
 import Service from '../models/Service.js'
-import User from '../models/User.js'
 import mongoose from 'mongoose'
+import { sendAppointmentConfirmationEmail } from '../utils/mailer.js'
+import User from '../models/User.js'
+import Pet from '../models/Pet.js'
 
 // Get appointment history for a specific user
 export const getUserAppointmentHistory = async (req, res) => {
@@ -99,12 +100,12 @@ export const getMyAppointmentHistory = async (req, res) => {
   try {
     const currentUser = req.user
     const userId = currentUser._id || currentUser.id
-    
+
     // Check if userId is valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: 'Invalid user ID format' })
     }
-    
+
     // Find all appointments for the current user and populate related data
     const appointments = await Appointment.find({ user: userId })
       .populate('user', 'name email phone')
@@ -165,7 +166,58 @@ const addNewAppointment = async (req, res) => {
       return res.status(400).json({ message: 'Thiếu dữ liệu bắt buộc!' })
     }
 
+    const [userInfo, petInfo, serviceInfo] = await Promise.all([
+      User.findById(user),
+      Pet.findById(pet),
+      Service.findById(service)
+    ])
+
+    if (!userInfo) {
+      return res.status(404).json({ message: 'Người dùng không tồn tại!' })
+    }
+    if (!petInfo) {
+      return res.status(404).json({ message: 'Thú cưng không tồn tại!' })
+    }
+    if (!serviceInfo) {
+      return res.status(404).json({ message: 'Dịch vụ không tồn tại!' })
+    }
+
+    const existing = await Appointment.findOne({
+      pet,
+      date,
+      timeSlot,
+      status: { $ne: 'cancelled' }
+    })
+    if (existing) {
+      return res.status(400).json({
+        message: 'Thú cưng đã có lịch trong khung giờ này!'
+      })
+    }
+
+
     const newAppointment = await Appointment.create(appointment)
+
+    console.log('Đã tạo lịch hẹn:', newAppointment)
+    console.log('Email người nhận:', userInfo.email)
+
+    const emailTo = userInfo.email
+    if (!emailTo) {
+      console.error('❌ Không có email người dùng!')
+      return res.status(400).json({ message: 'Người dùng chưa có email' })
+    }
+
+
+    // Sau khi tạo xong -> gửi email
+    await sendAppointmentConfirmationEmail(emailTo, {
+      customerName: userInfo.fullName || userInfo.name || 'Khách hàng',
+      service: serviceInfo.name,
+      petName: petInfo.name,
+      petType: petInfo.petType || 'Chưa cung cấp',
+      petAge: petInfo.age || 'Chưa cung cấp',
+      phone: userInfo.phone || 'Chưa cung cấp',
+      date,
+      time: timeSlot
+    })
 
     res.status(201).json({ message: 'Đã tạo lịch hẹn!', data: newAppointment })
   } catch (err) {
