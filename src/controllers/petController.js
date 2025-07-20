@@ -1,12 +1,22 @@
 // controllers/petController.js
 import Pet from '../models/Pet.js'
 import { StatusCodes } from 'http-status-codes'
+import cloudinary from '~/config/cloudinary.js'
 
-// Create a new Pet
 const createPet = async (req, res) => {
   try {
     const petData = req.body
-    petData.owner = req.user._id // Đảm bảo user đã đăng nhập
+    petData.owner = req.user._id // đảm bảo user đã login
+
+    // Kiểm tra nếu có file gửi lên
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'petspa/pets',
+        resource_type: 'image'
+      })
+      petData.image = result.secure_url // lưu URL ảnh vào DB
+    }
+
     const pet = await Pet.create(petData)
     res.status(StatusCodes.CREATED).json(pet)
   } catch (error) {
@@ -14,6 +24,9 @@ const createPet = async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Không thể tạo thú cưng' })
   }
 }
+
+export default createPet
+
 
 // Get all pets of the user (with pagination)
 const getPetsByUser = async (req, res) => {
@@ -96,10 +109,10 @@ const deletePet = async (req, res) => {
 }
 
 export const petController = {
-    createPet,
-    getPetsByUser,
-    getAllPets,
-    getPetById,
-    updatePet,
-    deletePet
+  createPet,
+  getPetsByUser,
+  getAllPets,
+  getPetById,
+  updatePet,
+  deletePet
 } 

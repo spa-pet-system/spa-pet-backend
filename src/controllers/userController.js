@@ -12,13 +12,13 @@ const getUserProfile = async (req, res) => {
   try {
     const userId = req.user._id
     const user = await User.findById(userId).select('-password -refreshToken')
-    
+
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({
         message: 'Không tìm thấy người dùng'
       })
     }
-    
+
     res.status(StatusCodes.OK).json(user)
   } catch (error) {
     console.error('Get user profile error:', error)
@@ -177,5 +177,5 @@ export const userController = {
   getUserProfile,
   updateProfile,
   changePassword,
-  uploadAvatar
+  uploadAvatar,
 }
