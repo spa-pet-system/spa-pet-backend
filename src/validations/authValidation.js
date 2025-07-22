@@ -57,7 +57,6 @@ const registerByPhone = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   console.log('req.body:', req.body)
-
   const correctCondition = Joi.object({
     phone: Joi.string()
       .trim()
@@ -81,7 +80,6 @@ const login = async (req, res, next) => {
   try {
     await correctCondition.validateAsync(req.body, { abortEarly: false })
     console.log('VALIDATION')
-
     next()
   } catch (error) {
     console.log(error);
@@ -90,7 +88,6 @@ const login = async (req, res, next) => {
     })
   }
 }
-
 
 const updateProfile = async (req, res, next) => {
   const correctCondition = Joi.object({
