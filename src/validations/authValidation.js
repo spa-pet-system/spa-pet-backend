@@ -23,6 +23,16 @@ const registerByPhone = async (req, res, next) => {
         'any.required': 'Mật khẩu là bắt buộc'
       }),
 
+    email: Joi.string()
+      .trim()
+      .strict()
+      .email()
+      .required()
+      .messages({
+        'string.email': 'Email không đúng định dạng',
+        'any.required': 'Email là bắt buộc'
+      }),
+
     name: Joi.string()
       .trim()
       .min(2)
@@ -47,7 +57,7 @@ const registerByPhone = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   console.log('req.body:', req.body)
-  
+
   const correctCondition = Joi.object({
     phone: Joi.string()
       .trim()
@@ -71,7 +81,7 @@ const login = async (req, res, next) => {
   try {
     await correctCondition.validateAsync(req.body, { abortEarly: false })
     console.log('VALIDATION')
- 
+
     next()
   } catch (error) {
     console.log(error);

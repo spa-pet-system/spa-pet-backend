@@ -8,7 +8,7 @@ import crypto from 'crypto'
 
 const registerByPhone = async (req, res) => {
   try {
-    const { phone, password, name } = req.body
+    const { phone, password, name, email } = req.body
 
     const existingUser = await User.findOne({ phone })
     if (existingUser) {
@@ -17,7 +17,7 @@ const registerByPhone = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const newUser = new User({ phone, password: hashedPassword, name })
+    const newUser = new User({ phone, password: hashedPassword, name, email })
     await newUser.save()
 
     res.status(201).json({ message: 'Tạo tài khoản thành công' })
@@ -30,6 +30,10 @@ const login = async (req, res) => {
   const { phone, password } = req.body
 
   const currentUser = await User.findOne({ phone })
+
+  if (!currentUser.isActive) {
+    return res.status(StatusCodes.FORBIDDEN).json({ message: 'Tài khoản của bạn đã bị khóa' })
+  }
   if (!currentUser) {
     return res.status(StatusCodes.NOT_FOUND).json({ message: 'Số điện thoại chua đăng ký' })
   }
