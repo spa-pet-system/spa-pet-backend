@@ -1,9 +1,12 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose'
 
 const notificationSchema = new mongoose.Schema({
-  content: { type: String, required: true },
-  recipients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // [] nghĩa gửi tất cả
-  createdAt: { type: Date, default: Date.now },
-});
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // nếu null: gửi toàn server
+  type: { type: String, enum: ['system', 'payment', 'appointment', 'reminder'] },
+  title: String,
+  content: String,
+  isRead: { type: Boolean, default: false }
+}, { timestamps: true })
 
-module.exports = mongoose.model('Notification', notificationSchema);
+const Notification = mongoose.model('Notification', notificationSchema)
+export default Notification
