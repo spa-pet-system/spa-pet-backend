@@ -213,9 +213,49 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+// Đếm tổng số lượng đơn hàng (admin)
+export const countOrders = async (req, res) => {
+  try {
+    const totalOrders = await Order.countDocuments();
+    res.status(StatusCodes.OK).json({
+      success: true,
+      totalOrders
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message || "Không thể đếm số lượng đơn hàng"
+    });
+  }
+};
+
+// Lấy tổng doanh thu (admin)
+export const getTotalRevenue = async (req, res) => {
+  try {
+    // Chỉ tính các đơn đã thanh toán (status: 'paid', 'shipped', 'delivered')
+    const paidStatuses = ['paid', 'shipped', 'delivered'];
+    const result = await Order.aggregate([
+      { $match: { status: { $in: paidStatuses } } },
+      { $group: { _id: null, totalRevenue: { $sum: "$total" } } }
+    ]);
+    const totalRevenue = result[0]?.totalRevenue || 0;
+    res.status(StatusCodes.OK).json({
+      success: true,
+      totalRevenue
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message || "Không thể tính tổng doanh thu"
+    });
+  }
+};
+
 export const orderController = {
   createOrder,
   getUserOrders,
   getOrderById,
   updateOrderStatus,
+  countOrders,
+  getTotalRevenue,
 };

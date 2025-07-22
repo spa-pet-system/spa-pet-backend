@@ -108,11 +108,28 @@ const deletePet = async (req, res) => {
   }
 }
 
+// Đếm tổng số lượng thú cưng đã phục vụ (admin)
+const countAllPets = async (req, res) => {
+  try {
+    const totalPets = await Pet.countDocuments();
+    res.status(StatusCodes.OK).json({
+      success: true,
+      totalPets
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message || 'Không thể đếm số lượng thú cưng'
+    });
+  }
+};
+
 export const petController = {
   createPet,
   getPetsByUser,
   getAllPets,
   getPetById,
   updatePet,
-  deletePet
+  deletePet,
+  countAllPets
 } 

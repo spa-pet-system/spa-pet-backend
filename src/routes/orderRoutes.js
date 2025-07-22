@@ -14,4 +14,10 @@ router.get('/:orderId', authMiddleware.authenTokenCookie, authMiddleware.isCusto
 // Admin order routes
 router.put('/:orderId/status', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, orderController.updateOrderStatus)
 
+// Đếm tổng số lượng đơn hàng (admin dashboard)
+router.get('/admin/count', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, orderController.countOrders)
+
+// Lấy tổng doanh thu (admin dashboard)
+router.get('/admin/revenue', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, orderController.getTotalRevenue)
+
 export default router
