@@ -7,6 +7,9 @@ import { productController } from '../controllers/productController.js'
 const router = express.Router()
 const upload = multer({ storage: multer.memoryStorage() })
 
+
+// Đếm số lượng dịch vụ đang hoạt động (admin dashboard)
+router.get('/services/count', serviceAdminController.countActiveServices)
 // Lấy danh sách dịch vụ
 router.get('/services', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, serviceAdminController.getAllServices)
 // Kích hoạt dịch vụ
@@ -21,5 +24,6 @@ router.post('/services', authMiddleware.authenTokenCookie, authMiddleware.isAdmi
 router.get('/services/:id', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, serviceAdminController.getServiceById)
 // cập nhật service
 router.put('/services/:id', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, serviceAdminController.updateService)
+
 
 export default router

@@ -13,6 +13,8 @@ router.get('/users', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, u
 router.patch('/users/:id/block', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, userAdminController.blockUser)
 // Unlock user
 router.patch('/users/:id/unlock', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, userAdminController.unlockUser)
+// Đếm số lượng khách hàng (role customer)
+router.get('/users/count', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, userAdminController.countCustomers)
 
 // ĐƠN HÀNG
 // Lấy danh sách đơn hàng

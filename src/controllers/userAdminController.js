@@ -31,8 +31,21 @@ const unlockUser = async (req, res) => {
   }
 };
 
+const countCustomers = async (req, res) => {
+  try {
+    const totalCustomers = await User.countDocuments({ role: 'customer' });
+    res.status(StatusCodes.OK).json({
+      success: true,
+      totalCustomers
+    });
+  } catch (err) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Lỗi server' });
+  }
+};
+
 export const userAdminController = {
   getAllUsers,
   blockUser,
-  unlockUser
+  unlockUser,
+  countCustomers
 };
