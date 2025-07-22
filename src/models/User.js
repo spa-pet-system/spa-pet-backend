@@ -45,6 +45,16 @@ const userSchema = new mongoose.Schema(
     dob: {
       type: Date
     },
+    penaltyPoints: {
+      type: Number,
+      default: 0
+    },
+    penaltyHistory: [
+      {
+        reason: String,
+        date: Date
+      }
+    ],
     isActive: {
       type: Boolean,
       default: true
@@ -56,7 +66,14 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
       default: ''
+    },
+    resetPasswordToken: {
+      type: String
+    },
+    resetTokenExpires: {
+      type: Date
     }
+
   },
   {
     timestamps: true
