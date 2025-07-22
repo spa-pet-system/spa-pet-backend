@@ -24,6 +24,8 @@ import orderRoutes from './routes/orderRoutes.js'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 const morgan = require('morgan')
+import http from 'http'
+import { Server as SocketIOServer } from 'socket.io'
 
 
 const START_SERVER = () => {
@@ -55,7 +57,29 @@ const START_SERVER = () => {
   app.use('/api/orders', orderRoutes)
   app.use(errorHandlingMiddleware)
 
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
+  // Tạo HTTP server và tích hợp socket.io
+  const server = http.createServer(app)
+  const io = new SocketIOServer(server, {
+    cors: {
+      origin: 'http://localhost:5173',
+      credentials: true
+    }
+  })
+
+  io.on('connection', (socket) => {
+    console.log('User connected:', socket.id)
+
+    socket.on('sendMessage', (msg) => {
+      // Broadcast lại cho tất cả client (bao gồm cả admin)
+      io.emit('receiveMessage', msg)
+    })
+
+    socket.on('disconnect', () => {
+      console.log('User disconnected:', socket.id)
+    })
+  })
+
+  server.listen(env.APP_PORT, env.APP_HOST, () => {
     console.log(`Hello ${env.AUTHOR}, I am running at http://${env.APP_HOST}:${env.APP_PORT}/`)
   })
 }
