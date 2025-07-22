@@ -22,4 +22,6 @@ router.get('/all', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, app
 // Get appointment by ID (accessible by the user themselves or admin)
 router.get('/:appointmentId', authMiddleware.authenTokenCookie, appointmentController.getAppointmentById)
 
+router.post('/:id/cancel-request', authMiddleware.authenTokenCookie, authMiddleware.isCustomer, appointmentController.requestCancel)
+
 export default router

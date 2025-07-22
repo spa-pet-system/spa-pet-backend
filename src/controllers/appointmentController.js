@@ -268,11 +268,29 @@ const countBySlot = async (req, res) => {
   }
 }
 
+const requestCancel = async (req, res) => {
+  const { id } = req.params
+  const { reason } = req.body
+  if (!reason) return res.status(400).json({ message: 'Phải có lý do hủy.' })
+
+  const appt = await Appointment.findById(id)
+  if (!appt) return res.status(404).json({ message: 'Không tìm thấy lịch hẹn.' })
+  if (['completed', 'cancelled'].includes(appt.status))
+    return res.status(400).json({ message: 'Không thể hủy lịch này.' })
+
+  appt.status = 'request_cancel'
+  appt.cancelReason = reason
+  await appt.save()
+
+  res.json({ message: 'Đã gửi yêu cầu hủy.', data: appt })
+}
+
 export const appointmentController = {
   getUserAppointmentHistory,
   getMyAppointmentHistory,
   getAllAppointments,
   getAppointmentById,
   countBySlot,
-  addNewAppointment
+  addNewAppointment,
+  requestCancel
 }
