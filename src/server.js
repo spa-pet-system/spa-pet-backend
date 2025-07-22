@@ -14,6 +14,7 @@ import appointmentRoutes from '~/routes/appointmentRoutes'
 import adminRoutes from './routes/adminRoutes'
 import serviceAdminRoutes from './routes/serviceAdminRoutes'
 import productAdminRoutes from './routes/productAdminRoutes'
+import adminNotifications from './routes/adminNotifications.js';
 
 // product
 import productRoutes from '~/routes/productRoutes'
@@ -22,6 +23,7 @@ import paymentRoutes from './routes/paymentRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
 import Message from './models/Message.js';
 import User from './models/User.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -48,9 +50,11 @@ const START_SERVER = () => {
   app.use('/api/admin', adminRoutes )
   app.use('/api/admin', serviceAdminRoutes)
   app.use('/api/admin', productAdminRoutes)
+  app.use('/api/admin', adminNotifications);
   app.use('/api/customer', serviceCustomerRoutes)
   app.use('/api/customer', petRoutes)
   app.use('/api/customer', appointmentRoutes)
+  app.use('/api/chat', chatRoutes);
 
   // Routes
   app.use('/api/products', productRoutes)
