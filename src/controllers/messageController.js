@@ -1,9 +1,9 @@
-import { MessageModel } from '~/models/Message'
+import Message from '~/models/Message'
 
 export const getMessagesByUser = async (req, res) => {
   try {
     const userId = req.params.userId
-    const messages = await MessageModel.find({
+    const messages = await Message.find({
       $or: [{ from: userId }, { to: userId }]
     }).sort({ timestamp: 1 })
 
