@@ -1,5 +1,6 @@
 import Appointment from '../models/Appointment.js';
 import { StatusCodes } from 'http-status-codes';
+import Notification from '../models/Notification.js';
 
 // Lấy danh sách lịch hẹn theo trạng thái cụ thể
 export const getPendingAppointments = async (req, res) => {
@@ -132,6 +133,38 @@ export const updateAppointmentStatus = async (req, res) => {
         message: 'Không tìm thấy lịch hẹn',
       });
     }
+
+    // Tạo notification cho user khi admin cập nhật trạng thái
+    let notifTitle = 'Cập nhật lịch hẹn';
+    let notifContent = '';
+    switch (status) {
+      case 'confirmed':
+        notifContent = `Lịch hẹn của bạn đã được xác nhận.`;
+        break;
+      case 'completed':
+        notifContent = `Lịch hẹn của bạn đã được hoàn thành. Cảm ơn bạn đã sử dụng dịch vụ!`;
+        break;
+      case 'cancelled':
+        notifContent = `Lịch hẹn của bạn đã bị hủy. Nếu có thắc mắc, vui lòng liên hệ với chúng tôi.`;
+        break;
+      case 'request_cancel':
+        notifContent = `Yêu cầu hủy lịch hẹn của bạn đã được ghi nhận.`;
+        break;
+      case 'pending':
+        notifContent = `Lịch hẹn của bạn đang chờ xác nhận.`;
+        break;
+      default:
+        notifContent = `Lịch hẹn của bạn đã được cập nhật trạng thái: ${status}`;
+    }
+    if (appointment.user && appointment.user._id) {
+      await Notification.create({
+        user: appointment.user._id,
+        type: 'appointment',
+        title: notifTitle,
+        content: notifContent,
+      });
+    }
+
     res.status(StatusCodes.OK).json({
       success: true,
       message: 'Cập nhật trạng thái lịch hẹn thành công',
