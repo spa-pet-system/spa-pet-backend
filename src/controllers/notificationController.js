@@ -2,13 +2,16 @@ import NotificationModel from '../models/Notification.js';
 
 export const getNotificationsByUser = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    console.log('getNotificationsByUser');
+    const userId = req.user._id; // Assuming user ID is stored in req.user
+    console.log('User ID:', userId);
     const notifications = await NotificationModel.find({
       $or: [
         { user: userId },
         { user: null }
       ]
     }).sort({ createdAt: -1 });
+    console.log('Notifications:', notifications);
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi lấy thông báo', error });

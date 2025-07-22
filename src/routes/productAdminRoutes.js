@@ -7,7 +7,7 @@ const router = express.Router()
 const upload = multer({ storage: multer.memoryStorage() })
 
 // Sản phẩm
-router.get('/products', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, productController.getAllProducts)
+router.get('/products', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, productController.getAllProductsAdmin)
 router.post('/products', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, productController.createProduct)
 router.post('/products/upload-image', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, upload.single('file'), productController.uploadImage)
 // Lấy sản phẩm theo id

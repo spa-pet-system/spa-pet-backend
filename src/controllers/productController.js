@@ -2,15 +2,15 @@ import Product from '../models/Product.js'
 import { StatusCodes } from 'http-status-codes'
 import cloudinary from '../config/cloudinary.js'
 
-// // Lấy danh sách sản phẩm
-// const getAllProducts = async (req, res) => {
-//   try {
-//     const products = await Product.find()
-//     res.status(StatusCodes.OK).json(products)
-//   } catch (err) {
-//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Lỗi server' })
-//   }
-// }
+// Lấy danh sách sản phẩm
+const getAllProductsAdmin = async (req, res) => {
+  try {
+    const products = await Product.find()
+    res.status(StatusCodes.OK).json(products)
+  } catch (err) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Lỗi server' })
+  }
+}
 
 // Thêm sản phẩm mới
 const createProduct = async (req, res) => {
@@ -69,9 +69,10 @@ const updateProduct = async (req, res) => {
 // Khóa sản phẩm (set isActive=false)
 const lockProduct = async (req, res) => {
   try {
+    console.log('Khóa sản phẩm:', req.params.id)
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      { isActive: false },
+      { isVisible: false },
       { new: true }
     )
     if (!product) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Không tìm thấy sản phẩm' })
@@ -86,7 +87,7 @@ const unlockProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      { isActive: true },
+      { isVisible: true },
       { new: true }
     )
     if (!product) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Không tìm thấy sản phẩm' })
@@ -166,5 +167,6 @@ export const productController = {
   getProductById,
   updateProduct,
   lockProduct,
-  unlockProduct
+  unlockProduct,
+  getAllProductsAdmin
 }

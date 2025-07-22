@@ -6,7 +6,7 @@ const appointmentSchema = new mongoose.Schema({
   service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service' },
   date: { type: Date, required: true }, // Chỉ lưu ngày
   timeSlot: { type: String, required: true }, // "09:00", "10:00"...
-  status: { type: String, enum: ['pending', 'confirmed', 'completed', 'cancelled', 'request_cancel'], default: 'pending' },
+  status: { type: String, enum: ['pending', 'confirmed', 'in_progress', 'waiting_payment', 'completed', 'cancelled', 'request_cancel'], default: 'pending' },
   cancelReason: {
     type: String,
     trim: true,

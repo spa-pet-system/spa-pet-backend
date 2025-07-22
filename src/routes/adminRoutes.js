@@ -30,6 +30,8 @@ router.delete('/orders/:orderId', authMiddleware.authenTokenCookie, authMiddlewa
 // Lấy danh sách lịch hẹn theo từng trạng thái
 router.get('/appointments/pending', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, appointmentAdminController.getPendingAppointments)
 router.get('/appointments/confirmed', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, appointmentAdminController.getConfirmedAppointments)
+router.get('/appointments/in_progress', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, appointmentAdminController.getInProgressAppointments)
+router.get('/appointments/waiting_payment', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, appointmentAdminController.getWatingPaymentAppointments)
 router.get('/appointments/completed', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, appointmentAdminController.getCompletedAppointments)
 router.get('/appointments/cancelled', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, appointmentAdminController.getCancelledAppointments)
 router.get('/appointments/request-cancel', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, appointmentAdminController.getRequestCancelAppointments)
