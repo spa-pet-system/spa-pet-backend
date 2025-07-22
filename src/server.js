@@ -20,6 +20,8 @@ import productRoutes from '~/routes/productRoutes'
 import cartRoutes from './routes/cartRoutes.js'
 import paymentRoutes from './routes/paymentRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
+import Message from './models/Message.js';
+import User from './models/User.js';
 
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -66,17 +68,82 @@ const START_SERVER = () => {
     }
   })
 
+  // Map userId <-> socketId
+  const userSocketMap = new Map(); // userId -> socketId
+  const socketUserMap = new Map(); // socketId -> userId
+  const adminSocketIds = new Set(); // Lưu socketId của các admin đang online
+
   io.on('connection', (socket) => {
-    console.log('User connected:', socket.id)
+    console.log('User connected:', socket.id);
 
-    socket.on('sendMessage', (msg) => {
-      // Broadcast lại cho tất cả client (bao gồm cả admin)
-      io.emit('receiveMessage', msg)
-    })
+    // Khi client join, truyền userId lên
+    socket.on('join', async ({ userId }) => {
+      if (userId) {
+        userSocketMap.set(userId, socket.id);
+        socketUserMap.set(socket.id, userId);
+        // Kiểm tra nếu là admin thì thêm vào danh sách admin online
+        try {
+          const user = await User.findById(userId);
+          if (user && user.role === 'admin') {
+            adminSocketIds.add(socket.id);
+            console.log(`Admin online: ${userId} (socket ${socket.id})`);
+          } else {
+            console.log(`User online: ${userId} (socket ${socket.id})`);
+          }
+        } catch (err) {
+          console.log('Lỗi khi kiểm tra role user:', err);
+        }
+        console.log(`User ${userId} joined with socket ${socket.id}`);
+      }
+    });
 
-    socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id)
-    })
+    // Gửi tin nhắn: { from, to, content }
+    socket.on('sendMessage', async (msg) => {
+      const { from, to, content } = msg;
+      if (!from || !content) return;
+      try {
+        let message;
+        if (to === 'admin') {
+          // Không lưu trường to, chỉ lưu from và content
+          message = await Message.create({ from, content });
+          console.log('Gửi tin nhắn đến tất cả admin online:', Array.from(adminSocketIds));
+          adminSocketIds.forEach(adminSocketId => {
+            io.to(adminSocketId).emit('receiveMessage', message);
+            console.log('Đã emit receiveMessage đến admin socket:', adminSocketId);
+          });
+        } else {
+          // Lưu bình thường nếu to là ObjectId
+          message = await Message.create({ from, to, content });
+          const toSocketId = userSocketMap.get(to);
+          if (toSocketId) {
+            io.to(toSocketId).emit('receiveMessage', message);
+            console.log('Đã emit receiveMessage đến user socket:', toSocketId);
+          }
+        }
+        socket.emit('receiveMessage', message);
+        console.log('Đã emit receiveMessage về cho người gửi:', socket.id);
+      } catch (err) {
+        console.error('Lỗi gửi/lưu tin nhắn:', err);
+      }
+    });
+
+    socket.on('disconnect', async () => {
+      const userId = socketUserMap.get(socket.id);
+      if (userId) {
+        userSocketMap.delete(userId);
+        socketUserMap.delete(socket.id);
+        try {
+          const user = await User.findById(userId);
+          if (user && user.role === 'admin') {
+            adminSocketIds.delete(socket.id);
+            console.log(`Admin offline: ${userId} (socket ${socket.id})`);
+          }
+        } catch {}
+        console.log(`User ${userId} disconnected (socket ${socket.id})`);
+      } else {
+        console.log('User disconnected:', socket.id);
+      }
+    });
   })
 
   server.listen(env.APP_PORT, env.APP_HOST, () => {
