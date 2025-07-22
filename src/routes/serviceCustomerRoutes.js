@@ -8,7 +8,7 @@ const router = express.Router()
 const upload = multer({ storage: multer.memoryStorage() })
 
 router.get('/service', serviceCustomerController.getAllServices)
-router.get('/service/:slug', authMiddleware.authenTokenCookie, authMiddleware.isCustomer, serviceCustomerController.getServiceBySlug)
+router.get('/service/:slug', authMiddleware.authenTokenCookie, serviceCustomerController.getServiceBySlug)
 
 router.post('/service/upload-image', authMiddleware.authenTokenCookie, authMiddleware.isCustomer, upload.single('file'), serviceCustomerController.uploadImage)
 
