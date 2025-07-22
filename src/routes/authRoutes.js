@@ -1,11 +1,22 @@
-import { Router } from 'express'
-import { signup_get, signup_post } from '~/controllers/authController'
+import express from 'express'
+import { authController } from '~/controllers/authController'
+import { authMiddleware } from '~/middlewares/authMiddleware'
+import { authValidation } from '~/validations/authValidation'
+import { userController } from '~/controllers/userController'
+import multer from 'multer'
 
-const router = Router()
+const router = express.Router()
+const upload = multer({ storage: multer.memoryStorage() })
 
-router.get('/signup', signup_get)
-router.post('/signup', signup_post)
-router.get('/login', () => {})
-router.post('/login', () => {})
+router.post('/register', authValidation.registerByPhone, authController.registerByPhone)
+router.post('/login', authValidation.login, authController.login)
+router.post('/logout', authController.logout)
+router.get('/me', authMiddleware.authenTokenCookie, userController.getProfile)
+router.get('/user-profile', authMiddleware.authenTokenCookie, userController.getUserProfile)
+router.put('/profile', authMiddleware.authenTokenCookie, upload.single('avatar'), authValidation.updateProfile, userController.updateProfile)
+router.post('/upload-avatar', authMiddleware.authenTokenCookie, upload.single('avatar'), userController.uploadAvatar)
+router.put('/change-password', authValidation.changePassword, authMiddleware.authenTokenCookie, userController.changePassword)
+router.post('/forgot-password', authValidation.forgotPassword, authController.forgotPassword)
+router.post('/reset-password/:token', authValidation.resetPassword, authController.resetPassword)
 
-module.exports = router
+export default router
