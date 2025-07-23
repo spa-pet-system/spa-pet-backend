@@ -14,6 +14,7 @@ import appointmentRoutes from '~/routes/appointmentRoutes'
 import adminRoutes from './routes/adminRoutes'
 import serviceAdminRoutes from './routes/serviceAdminRoutes'
 import productAdminRoutes from './routes/productAdminRoutes'
+import adminNotifications from './routes/adminNotifications.js';
 
 // product
 import productRoutes from '~/routes/productRoutes'
@@ -22,6 +23,8 @@ import paymentRoutes from './routes/paymentRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
 import Message from './models/Message.js';
 import User from './models/User.js';
+import chatRoutes from './routes/chatRoutes.js';
+import priceTableRoutes from './routes/priceTableRoutes.js';
 
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -48,15 +51,18 @@ const START_SERVER = () => {
   app.use('/api/admin', adminRoutes )
   app.use('/api/admin', serviceAdminRoutes)
   app.use('/api/admin', productAdminRoutes)
+  app.use('/api/admin', adminNotifications);
   app.use('/api/customer', serviceCustomerRoutes)
   app.use('/api/customer', petRoutes)
   app.use('/api/customer', appointmentRoutes)
+  app.use('/api/chat', chatRoutes);
 
   // Routes
   app.use('/api/products', productRoutes)
   app.use('/api/cart', cartRoutes)
   app.use('/api/payment', paymentRoutes)
   app.use('/api/orders', orderRoutes)
+  app.use('/api/price-table', priceTableRoutes)
   app.use(errorHandlingMiddleware)
 
   // Tạo HTTP server và tích hợp socket.io
@@ -138,7 +144,9 @@ const START_SERVER = () => {
             adminSocketIds.delete(socket.id);
             console.log(`Admin offline: ${userId} (socket ${socket.id})`);
           }
-        } catch {}
+        } catch (err) {
+          console.log('Lỗi khi kiểm tra role user khi ngắt kết nối:', err);
+        }
         console.log(`User ${userId} disconnected (socket ${socket.id})`);
       } else {
         console.log('User disconnected:', socket.id);

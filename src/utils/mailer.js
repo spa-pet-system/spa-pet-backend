@@ -98,3 +98,45 @@ export const sendResetPasswordEmail = async (to, name, link) => {
 
   await transporter.sendMail(mailOptions)
 }
+
+
+export const sendServiceCompletedEmail = async (to, info) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: env.EMAIL_USER,
+      pass: env.EMAIL_PASS
+    }
+  })
+
+  const { customerName, service, petName, date, time, totalCost } = info
+
+  const mailOptions = {
+    from: `"Spa Pet" <${env.EMAIL_USER}>`,
+    to,
+    subject: '🐾 Thông báo: Dịch vụ đã hoàn thành tại Spa Pet',
+    html: `
+      <div style="font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 20px;">
+        <div style="max-width:600px;margin:auto;background:#fff;padding:20px;border-radius:8px;">
+          <h2 style="color:#f97316;">🐾 Spa Pet - Dịch vụ hoàn thành</h2>
+          <p>Chào <strong>${customerName}</strong>,</p>
+          <p>Dịch vụ <strong>${service}</strong> cho thú cưng <strong>${petName}</strong> của bạn đã hoàn tất:</p>
+          <ul>
+            <li><strong>Ngày hẹn:</strong> ${date}</li>
+            <li><strong>Khung giờ:</strong> ${time}</li>
+            <li><strong>Tổng chi phí:</strong> ${totalCost}</li>
+          </ul>
+          <p style="margin-top:20px;">
+            Vui lòng đến Spa Pet để nhận lại thú cưng và thanh toán tại quầy lễ tân. 
+            Chúng tôi rất mong được gặp lại bạn!
+          </p>
+          <p style="margin-top:30px;color:gray;font-size:0.9em;">
+            — Đội ngũ Spa Pet
+          </p>
+        </div>
+      </div>
+    `
+  }
+
+  await transporter.sendMail(mailOptions)
+}

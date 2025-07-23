@@ -9,6 +9,12 @@ export const getPendingAppointments = async (req, res) => {
 export const getConfirmedAppointments = async (req, res) => {
   return getAppointmentsByStatus(req, res, 'confirmed');
 };
+export const getInProgressAppointments = async (req, res) => {
+  return getAppointmentsByStatus(req, res, 'in_progress');
+};
+export const getWatingPaymentAppointments = async (req, res) => {
+  return getAppointmentsByStatus(req, res, 'waiting_payment');
+};
 export const getCompletedAppointments = async (req, res) => {
   return getAppointmentsByStatus(req, res, 'completed');
 };
@@ -112,40 +118,65 @@ export const updateAppointmentStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const { status } = req.body;
-    const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled', 'request_cancel'];
+    console.log('Cập nhật trạng thái lịch hẹn:', status);
+    // Thêm 'awaiting_payment' và 'paid' vào danh sách các status hợp lệ
+    const validStatuses = [
+      'pending',
+      'confirmed',
+      'in_progress',       // nhân viên đang làm dịch vụ
+      'waiting_payment',  // nhân viên báo xong, chờ khách trả
+      'paid',              // khách đã thanh toán
+      'completed',
+      'cancelled',
+      'request_cancel'
+    ];
     if (!validStatuses.includes(status)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'Trạng thái không hợp lệ',
       });
     }
-    const appointment = await Appointment.findByIdAndUpdate(
-      appointmentId,
-      { status },
-      { new: true }
-    )
-      .populate('user', 'name email phone')
-      .populate('pet', 'name breed age')
-      .populate('service', 'name price description');
-    if (!appointment) {
+
+    // Lấy appointment ban đầu để kiểm tra/update isPaid
+    const appointmentDoc = await Appointment.findById(appointmentId);
+    if (!appointmentDoc) {
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
         message: 'Không tìm thấy lịch hẹn',
       });
     }
 
-    // Tạo notification cho user khi admin cập nhật trạng thái
-    let notifTitle = 'Cập nhật lịch hẹn';
+    // Update status
+    const appointment = await Appointment.findByIdAndUpdate(
+      appointmentId,
+      { status },
+      { new: true },
+    )
+    .populate('user', 'name email phone')
+    .populate('pet', 'name breed age')
+    .populate('service', 'name price description');
+
+    // Tạo notification cho user
+    let notifTitle   = 'Cập nhật lịch hẹn';
     let notifContent = '';
     switch (status) {
       case 'confirmed':
         notifContent = `Lịch hẹn của bạn đã được xác nhận.`;
         break;
+      case 'in_progress':
+        notifContent = `Nhân viên đang thực hiện dịch vụ cho bạn.`;
+        break;
+      case 'waiting_payment':
+        notifContent = `Dịch vụ đã hoàn tất, vui lòng thanh toán để hoàn tất lịch hẹn.`;
+        break;
+      case 'paid':
+        notifContent = `Bạn đã thanh toán thành công. Cảm ơn bạn!`;
+        break;
       case 'completed':
-        notifContent = `Lịch hẹn của bạn đã được hoàn thành. Cảm ơn bạn đã sử dụng dịch vụ!`;
+        notifContent = `Lịch hẹn của bạn đã hoàn thành.`;
         break;
       case 'cancelled':
-        notifContent = `Lịch hẹn của bạn đã bị hủy. Nếu có thắc mắc, vui lòng liên hệ với chúng tôi.`;
+        notifContent = `Lịch hẹn của bạn đã bị hủy.`;
         break;
       case 'request_cancel':
         notifContent = `Yêu cầu hủy lịch hẹn của bạn đã được ghi nhận.`;
@@ -158,9 +189,9 @@ export const updateAppointmentStatus = async (req, res) => {
     }
     if (appointment.user && appointment.user._id) {
       await Notification.create({
-        user: appointment.user._id,
-        type: 'appointment',
-        title: notifTitle,
+        user:    appointment.user._id,
+        type:    'appointment',
+        title:   notifTitle,
         content: notifContent,
       });
     }
@@ -168,7 +199,7 @@ export const updateAppointmentStatus = async (req, res) => {
     res.status(StatusCodes.OK).json({
       success: true,
       message: 'Cập nhật trạng thái lịch hẹn thành công',
-      data: appointment,
+      data:    appointment,
     });
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -177,6 +208,7 @@ export const updateAppointmentStatus = async (req, res) => {
     });
   }
 };
+
 
 // Xóa lịch hẹn
 export const deleteAppointment = async (req, res) => {
@@ -204,6 +236,8 @@ export const deleteAppointment = async (req, res) => {
 export const appointmentAdminController = {
   getPendingAppointments,
   getConfirmedAppointments,
+  getInProgressAppointments,
+  getWatingPaymentAppointments,
   getCompletedAppointments,
   getCancelledAppointments,
   getRequestCancelAppointments,

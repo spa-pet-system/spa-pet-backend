@@ -87,6 +87,20 @@ const updateService = async (req, res) => {
   }
 };
 
+const countActiveServices = async (req, res) => {
+  console.log('countActiveServices');
+  
+  try {
+    const totalActiveServices = await Service.countDocuments({ isActive: true });
+    res.status(StatusCodes.OK).json({
+      totalActiveServices
+    });
+  } catch (err) {
+    console.error('Lỗi countActiveServices:', err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Lỗi server' });
+  }
+};
+
 export const serviceAdminController = {
   getAllServices,
   activateService,
@@ -95,4 +109,5 @@ export const serviceAdminController = {
   createService,
   getServiceById,
   updateService,
+  countActiveServices
 };

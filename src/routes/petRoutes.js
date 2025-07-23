@@ -14,5 +14,7 @@ router.delete('/pets/:id', authMiddleware.authenTokenCookie, authMiddleware.isCu
 router.get('/pets', authMiddleware.authenTokenCookie, authMiddleware.isCustomer, petController.getAllPets)
 
 router.post('/pets/create-pet', petController.createPet)
+// Đếm tổng số lượng thú cưng đã phục vụ (admin dashboard)
+router.get('/pets/admin/count', authMiddleware.authenTokenCookie, authMiddleware.isAdmin, petController.countAllPets)
 
 export default router
