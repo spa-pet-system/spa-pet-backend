@@ -24,6 +24,7 @@ import orderRoutes from './routes/orderRoutes.js'
 import Message from './models/Message.js';
 import User from './models/User.js';
 import chatRoutes from './routes/chatRoutes.js';
+import priceTableRoutes from './routes/priceTableRoutes.js';
 
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -61,6 +62,7 @@ const START_SERVER = () => {
   app.use('/api/cart', cartRoutes)
   app.use('/api/payment', paymentRoutes)
   app.use('/api/orders', orderRoutes)
+  app.use('/api/price-table', priceTableRoutes)
   app.use(errorHandlingMiddleware)
 
   // Tạo HTTP server và tích hợp socket.io
@@ -142,7 +144,9 @@ const START_SERVER = () => {
             adminSocketIds.delete(socket.id);
             console.log(`Admin offline: ${userId} (socket ${socket.id})`);
           }
-        } catch {}
+        } catch (err) {
+          console.log('Lỗi khi kiểm tra role user khi ngắt kết nối:', err);
+        }
         console.log(`User ${userId} disconnected (socket ${socket.id})`);
       } else {
         console.log('User disconnected:', socket.id);
